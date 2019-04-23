@@ -3,4 +3,8 @@ project(simulation_work_2019)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(simulation_work_2019 main.cpp)
+include_directories(.)
+
+add_executable(simulation_work_2019
+        CMakeLists.txt
+        main.cpp)
