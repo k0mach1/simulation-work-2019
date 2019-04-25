@@ -17,6 +17,12 @@ public:
         this->x = x;
         this->y = y;
     }
+
+    Vector& operator = (const Vector& v) {
+        this->x = v.x;
+        this->y = v.y;
+        return *this;
+    }
 };
 
 // MARK :: Binary Operator for Vector Class
@@ -52,19 +58,31 @@ private:
     Vector position;
     Vector best_position;
     Vector velocity;
+    float  best_value;
 public:
+    Particle() {}
+
     Particle(Vector position) {
         this->position      = position;
         this->best_position = position;
         this->velocity      = Vector();
+        this->best_value    = function_value();
     }
 
     void update_position() {
         this->position = position + velocity;
     }
 
+    void update_best_position_and_value() {
+        float new_value = function_value();
+        if (new_value < best_value) {
+            this->best_position = position;
+            this->best_value    = new_value;
+        }
+    }
+
     void update_velocity(Vector global_best_position) {
-        // memo :: Assign r1 and r2
+        // memo :: assign r1 and r2
         std::random_device engine;
         std::uniform_real_distribution<float> dist(0, 1.0);
         float r1 = dist(engine);
@@ -75,8 +93,8 @@ public:
                             + (c2 * r2) * (global_best_position - position);
     }
 
-    float value() {
-        return 1.0;
+    float function_value() {
+        return position.x * position.x + position.y * position.y;
     }
 };
 
@@ -103,6 +121,10 @@ public:
     }
 
     void run() {
+        Particle particles[particle_count];
+        float    best_value;
+        Vector   best_position;
+
         std::random_device engine;
         std::uniform_real_distribution<float> x_dist(x_min, x_max);
         std::uniform_real_distribution<float> y_dist(y_min, y_max);
@@ -113,7 +135,20 @@ public:
             Vector position = Vector(x, y);
             Particle particle = Particle(position);
         }
+
+        // TODO :: Calculate Best Value and Position
+
+        for(int loop = 0; loop < loop_count; loop++) {
+            // memo :: update particles
+            for(Particle particle: particles) {
+                particle.update_position();
+                particle.update_velocity(best_position);
+                particle.update_best_position_and_value();
+            }
+        }
     }
+
+
 };
 
 int main() {
