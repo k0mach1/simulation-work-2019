@@ -52,14 +52,14 @@ Vector operator *(const float a, const Vector u){	//内積 vector*vector
 
 class Particle {
 private:
-    const float w  = 0.5;
-    const float c1 = 1.0;
-    const float c2 = 1.0;
+    float w  = 0.5;
+    float c1 = 1.0;
+    float c2 = 1.0;
 
-    Vector position;
+    Vector      position;
     Vector best_position;
-    Vector velocity;
-    float  best_value;
+    Vector      velocity;
+    float     best_value;
 
     float function_value() {
         return position.x * position.x + position.y * position.y;
@@ -107,16 +107,17 @@ public:
     }
 };
 
+
 struct Application {
 private:
     int particle_count;
-    int loop_count;
-    float x_min;
-    float x_max;
-    float y_min;
-    float y_max;
+    int     loop_count;
+    float        x_min;
+    float        x_max;
+    float        y_min;
+    float        y_max;
 
-    std::tuple<Vector, float> calculate_best_position_and_value(Particle *particles, int particle_count) {
+    static std::tuple<Vector, float> calculate_best_position_and_value(Particle *particles, int particle_count) {
         Vector best_position = particles[0].get_best_position();
         float  best_value = particles[0].get_best_value();
 
@@ -141,10 +142,6 @@ public:
         this->y_max          = y_max;
     }
 
-    void setup() {
-
-    }
-
     void run() {
         Particle particles[particle_count];
         float    best_value;
@@ -159,9 +156,12 @@ public:
             float y = y_dist(engine);
             Vector position = Vector(x, y);
             Particle particle = Particle(position);
+            particles[i] = particle;
         }
 
         std::tie(best_position, best_value) = calculate_best_position_and_value(particles, particle_count);
+        std::cout << "GLOBAL BEST VALUE    : " << best_value << std::endl;
+        std::cout << "GLOBAL BEST POSITION : (" << best_position.x << ", " << best_position.y << ")" << std::endl;
 
         for(int loop = 0; loop < loop_count; loop++) {
             // memo :: update particles
@@ -174,15 +174,16 @@ public:
             // memo :: calculate global best position and value after all particles are updated
             std::tie(best_position, best_value) = calculate_best_position_and_value(particles, particle_count);
 
-            std::cout << "  ----- LOOP " << loop << " ------" << endl;
-            std::cout << "GLOBAL BEST VALUE   : " << best_value << endl;
-            std::cout << "GLOBAL BEST POSITION: (" << best_position.x << ", " << best_position.y << ")" << endl;
+            std::cout << "  ----- LOOP : " << loop << " ------" << std::endl;
+            std::cout << "GLOBAL BEST VALUE    : " << best_value << std::endl;
+            std::cout << "GLOBAL BEST POSITION : (" << best_position.x << ", " << best_position.y << ")" << std::endl;
         }
     }
 };
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    Application application = Application(10, 2, -5.0, 5.0, -5.0, 5.0);
+    application.run();
     return 0;
 }
 
