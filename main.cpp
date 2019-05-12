@@ -1,11 +1,15 @@
 #include <iostream>
 #include <random>
 #include <tuple>
+#include <cmath>
+#include<fstream>
 
 using namespace std;
 
 struct Vector {
 public:
+    int n = 2;
+
     float x;
     float y;
 
@@ -60,17 +64,31 @@ private:
     Vector best_position;
     Vector      velocity;
     float     best_value;
+    int      problem_num;
 
     float function_value() {
-        return position.x * position.x + position.y * position.y;
+        if (problem_num == 0) {
+            return position.x * position.x + position.y * position.y;
+        } else if (problem_num == 1) {
+            return 10 * position.n
+                + (position.x * position.x - 10 * std::cos(2 * M_PI * position.x))
+                + (position.y * position.y - 10 * std::cos(2 * M_PI * position.y));
+        } else if (problem_num == 2) {
+            return 1
+                + (position.x * position.x) + (position.y * position.y)
+                - std::cos(position.x / std::sqrt(1)) * std::cos(position.y / std::sqrt(2));
+        } else {
+            return 0.0;
+        }
     }
 public:
     Particle() {}
 
-    Particle(Vector position) {
+    Particle(Vector position, int problem_num) {
         this->position      = position;
         this->best_position = position;
         this->velocity      = Vector();
+        this->problem_num   = problem_num;
         this->best_value    = function_value();
     }
 
@@ -116,6 +134,7 @@ private:
     float        x_max;
     float        y_min;
     float        y_max;
+    int    problem_num;
 
     static std::tuple<Vector, float> calculate_best_position_and_value(Particle *particles, int particle_count) {
         Vector best_position = particles[0].get_best_position();
@@ -133,13 +152,14 @@ private:
     };
     
 public:
-    Application(int particle_count, int loop_count, float x_min, float x_max, float y_min, float y_max) {
+    Application(int particle_count, int loop_count, float x_min, float x_max, float y_min, float y_max, int problem_num) {
         this->particle_count = particle_count;
         this->loop_count     = loop_count;
         this->x_min          = x_min;
         this->x_max          = x_max;
         this->y_min          = y_min;
         this->y_max          = y_max;
+        this->problem_num    = problem_num;
     }
 
     void run() {
@@ -155,11 +175,13 @@ public:
             float x = x_dist(engine);
             float y = y_dist(engine);
             Vector position = Vector(x, y);
-            Particle particle = Particle(position);
+            Particle particle = Particle(position, problem_num);
             particles[i] = particle;
         }
 
         std::tie(best_position, best_value) = calculate_best_position_and_value(particles, particle_count);
+
+        ofstream outputfile("pso.txt");
 
         for(int loop = 0; loop < loop_count; loop++) {
             // memo :: update particles
@@ -177,13 +199,33 @@ public:
             std::cout << "  ----- LOOP : " << loop << " ------" << std::endl;
             std::cout << "GLOBAL BEST VALUE    : " << best_value << std::endl;
             std::cout << "GLOBAL BEST POSITION : (" << best_position.x << ", " << best_position.y << ")" << std::endl;
+
+            outputfile << best_value << std::endl;
         }
+
+        outputfile.close();
     }
 };
 
 int main() {
-    Application application = Application(100, 100, -5.0, 5.0, -5.0, 5.0);
-    application.run();
+    while (true) {
+        int problem_num;
+        cout << "Input problem number [0]Sphere [1]Rastrigin [2]Griewank :";
+        std::cin >> problem_num;
+        if (problem_num == 0) {
+            Application application = Application(100, 100, -5.0, 5.0, -5.0, 5.0, 1);
+            application.run();
+            break;
+        } else if (problem_num == 1) {
+            Application application = Application(100, 100, -5.0, 5.0, -5.0, 5.0, 2);
+            application.run();
+            break;
+        } else if (problem_num == 2) {
+            Application application = Application(100, 100, -600.0, 600.0, -5.0, 5.0, 3);
+            application.run();
+            break;
+        }
+    }
     return 0;
 }
 
