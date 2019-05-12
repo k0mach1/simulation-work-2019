@@ -73,7 +73,7 @@ private:
                 + (position.y * position.y - 10 * std::cos(2 * M_PI * position.y));
         } else if (problem_num == 2) {
             return 1
-                + (position.x * position.x) + (position.y * position.y)
+                + ((position.x * position.x) + (position.y * position.y)) / 4000
                 - std::cos(position.x / std::sqrt(1)) * std::cos(position.y / std::sqrt(2));
         } else {
             return 0.0;
@@ -130,8 +130,6 @@ private:
     int     loop_count;
     float        x_min;
     float        x_max;
-    float        y_min;
-    float        y_max;
     int    problem_num;
 
     static std::tuple<Vector, float> calculate_best_position_and_value(Particle *particles, int particle_count) {
@@ -150,13 +148,11 @@ private:
     };
     
 public:
-    Application(int particle_count, int loop_count, float x_min, float x_max, float y_min, float y_max, int problem_num) {
+    Application(int particle_count, int loop_count, float x_min, float x_max, int problem_num) {
         this->particle_count = particle_count;
         this->loop_count     = loop_count;
         this->x_min          = x_min;
         this->x_max          = x_max;
-        this->y_min          = y_min;
-        this->y_max          = y_max;
         this->problem_num    = problem_num;
     }
 
@@ -167,11 +163,10 @@ public:
 
         std::random_device engine;
         std::uniform_real_distribution<float> x_dist(x_min, x_max);
-        std::uniform_real_distribution<float> y_dist(y_min, y_max);
 
         for(int i = 0; i < particle_count; i++) {
             float x = x_dist(engine);
-            float y = y_dist(engine);
+            float y = x_dist(engine);
             Vector position = Vector(x, y);
             Particle particle = Particle(position, problem_num);
             particles[i] = particle;
@@ -214,15 +209,15 @@ int main() {
         std::cout << "Input problem number [0]Sphere [1]Rastrigin [2]Griewank :";
         std::cin >> problem_num;
         if (problem_num == 0) {
-            Application application = Application(100, 100, -5.0, 5.0, -5.0, 5.0, 1);
+            Application application = Application(100, 100, -5.0, 5.0, 0);
             application.run();
             break;
         } else if (problem_num == 1) {
-            Application application = Application(100, 100, -5.0, 5.0, -5.0, 5.0, 2);
+            Application application = Application(100, 100, -5.0, 5.0, 1);
             application.run();
             break;
         } else if (problem_num == 2) {
-            Application application = Application(100, 100, -600.0, 600.0, -5.0, 5.0, 3);
+            Application application = Application(100, 100, -600.0, 600.0, 2);
             application.run();
             break;
         }
