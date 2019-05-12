@@ -124,7 +124,7 @@ public:
 };
 
 
-struct Application {
+struct PSOApplication {
 private:
     int particle_count;
     int     loop_count;
@@ -148,7 +148,7 @@ private:
     };
     
 public:
-    Application(int particle_count, int loop_count, float x_min, float x_max, int problem_num) {
+    PSOApplication(int particle_count, int loop_count, float x_min, float x_max, int problem_num) {
         this->particle_count = particle_count;
         this->loop_count     = loop_count;
         this->x_min          = x_min;
@@ -189,12 +189,15 @@ public:
             // memo :: calculate global best position and value after all particles are updated
             std::tie(best_position, best_value) = calculate_best_position_and_value(particles, particle_count);
 
-            std::cout << "  ----- LOOP : " << loop << " ------" << std::endl;
-            std::cout << "GLOBAL BEST VALUE    : " << best_value << std::endl;
-            std::cout << "GLOBAL BEST POSITION : (" << best_position.x << ", " << best_position.y << ")" << std::endl;
+//            std::cout << "  ----- LOOP : " << loop << " ------" << std::endl;
+//            std::cout << "GLOBAL BEST VALUE    : " << best_value << std::endl;
+//            std::cout << "GLOBAL BEST POSITION : (" << best_position.x << ", " << best_position.y << ")" << std::endl;
+
+            std::cout << best_value << std::endl;
 
             outputfile << best_value << std::endl;
         }
+        std::cout << best_position.x << ", " << best_position.y << std::endl;
 
         outputfile.close();
     }
@@ -209,15 +212,15 @@ int main() {
         std::cout << "Input problem number [0]Sphere [1]Rastrigin [2]Griewank :";
         std::cin >> problem_num;
         if (problem_num == 0) {
-            Application application = Application(100, 100, -5.0, 5.0, 0);
+            PSOApplication application = PSOApplication(particle_count, 100, -5.0, 5.0, 0);
             application.run();
             break;
         } else if (problem_num == 1) {
-            Application application = Application(100, 100, -5.0, 5.0, 1);
+            PSOApplication application = PSOApplication(particle_count, 100, -5.0, 5.0, 1);
             application.run();
             break;
         } else if (problem_num == 2) {
-            Application application = Application(100, 100, -600.0, 600.0, 2);
+            PSOApplication application = PSOApplication(particle_count, 100, -600.0, 600.0, 2);
             application.run();
             break;
         }
