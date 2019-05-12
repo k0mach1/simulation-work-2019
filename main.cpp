@@ -119,7 +119,7 @@ private:
 
     static std::tuple<Vector, float> calculate_best_position_and_value(Particle *particles, int particle_count) {
         Vector best_position = particles[0].get_best_position();
-        float  best_value = particles[0].get_best_value();
+        float  best_value    = particles[0].get_best_value();
 
         for(int i = 0; i < particle_count; i++) {
             Particle particle = particles[i];
@@ -160,15 +160,15 @@ public:
         }
 
         std::tie(best_position, best_value) = calculate_best_position_and_value(particles, particle_count);
-        std::cout << "GLOBAL BEST VALUE    : " << best_value << std::endl;
-        std::cout << "GLOBAL BEST POSITION : (" << best_position.x << ", " << best_position.y << ")" << std::endl;
 
         for(int loop = 0; loop < loop_count; loop++) {
             // memo :: update particles
-            for(Particle particle: particles) {
+            for(int i = 0; i < particle_count; i++) {
+                Particle particle = particles[i];
                 particle.update_position();
                 particle.update_velocity(best_position);
                 particle.update_best_position_and_value();
+                particles[i] = particle;
             }
 
             // memo :: calculate global best position and value after all particles are updated
@@ -182,7 +182,7 @@ public:
 };
 
 int main() {
-    Application application = Application(10, 2, -5.0, 5.0, -5.0, 5.0);
+    Application application = Application(100, 100, -5.0, 5.0, -5.0, 5.0);
     application.run();
     return 0;
 }
