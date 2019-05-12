@@ -2,9 +2,7 @@
 #include <random>
 #include <tuple>
 #include <cmath>
-#include<fstream>
-
-using namespace std;
+#include <fstream>
 
 struct Vector {
 public:
@@ -181,7 +179,7 @@ public:
 
         std::tie(best_position, best_value) = calculate_best_position_and_value(particles, particle_count);
 
-        ofstream outputfile("pso.txt");
+        std::ofstream outputfile("pso.txt");
 
         for(int loop = 0; loop < loop_count; loop++) {
             // memo :: update particles
@@ -209,8 +207,11 @@ public:
 
 int main() {
     while (true) {
-        int problem_num;
-        cout << "Input problem number [0]Sphere [1]Rastrigin [2]Griewank :";
+        int particle_count;
+        int    problem_num;
+        std::cout << "Input Particle Count:";
+        std::cin >> particle_count;
+        std::cout << "Input problem number [0]Sphere [1]Rastrigin [2]Griewank :";
         std::cin >> problem_num;
         if (problem_num == 0) {
             Application application = Application(100, 100, -5.0, 5.0, -5.0, 5.0, 1);
